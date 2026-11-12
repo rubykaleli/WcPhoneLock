@@ -1,0 +1,156 @@
+name: RestroomRestriction
+options:
+  bundleIdPrefix: com.rubykaleli
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    TARGETED_DEVICE_FAMILY: 1
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+targets:
+  RestroomRestriction:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSLocationWhenInUseUsageDescription: Restroom Restriction uses your location to arm protection when you arrive home.
+        NSLocationAlwaysAndWhenInUseUsageDescription: Restroom Restriction uses your location to keep home protection active automatically.
+        NSMotionUsageDescription: Restroom Restriction uses motion sensors to verify whether you are in the bathroom during room checks.
+        NSUserNotificationUsageDescription: Restroom Restriction uses notifications to remind you when verification is needed.
+        NSBluetoothAlwaysUsageDescription: PoopLock uses Bluetooth to support home and room context (similar to Wi‑Fi tools). You can change this in Settings.
+        NSLocalNetworkUsageDescription: PoopLock looks for devices and services on your local network to improve home detection. You can change this in Settings.
+        NSBonjourServices:
+          - _http._tcp
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: com.rubykaleli.pooplock.url
+            CFBundleURLSchemes:
+              - pooplock
+        LSApplicationQueriesSchemes:
+          - shortcuts
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rubykaleli.RestroomRestriction
+        PRODUCT_NAME: RestroomRestriction
+        APP_DISPLAY_NAME: WcPhoneLock
+        INFOPLIST_FILE: App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: App/RestroomRestriction.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies:
+      - target: RestroomShieldConfiguration
+        embed: true
+      - target: RestroomShieldAction
+        embed: true
+      - target: RestroomDeviceActivityMonitor
+        embed: true
+
+  RestroomRestrictionLocal:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSLocationWhenInUseUsageDescription: Restroom Restriction uses your location to arm protection when you arrive home.
+        NSLocationAlwaysAndWhenInUseUsageDescription: Restroom Restriction uses your location to keep home protection active automatically.
+        NSMotionUsageDescription: Restroom Restriction uses motion sensors to verify whether you are in the bathroom during room checks.
+        NSUserNotificationUsageDescription: Restroom Restriction uses notifications to remind you when verification is needed.
+        NSBluetoothAlwaysUsageDescription: PoopLock uses Bluetooth to support home and room context (similar to Wi‑Fi tools). You can change this in Settings.
+        NSLocalNetworkUsageDescription: PoopLock looks for devices and services on your local network to improve home detection. You can change this in Settings.
+        NSBonjourServices:
+          - _http._tcp
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: com.rubykaleli.pooplock.url
+            CFBundleURLSchemes:
+              - pooplock
+        LSApplicationQueriesSchemes:
+          - shortcuts
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rubykaleli.RestroomRestrictionLocal
+        PRODUCT_NAME: RestroomRestrictionLocal
+        APP_DISPLAY_NAME: WcPhoneLock Test
+        INFOPLIST_FILE: App/Info.plist
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) LOCAL_TESTING
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  RestroomShieldConfiguration:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/ShieldConfiguration
+      - path: Shared
+    info:
+      path: Extensions/ShieldConfiguration/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettingsUI.shield-configuration-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).RestroomShieldConfigurationExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rubykaleli.RestroomRestriction.ShieldConfiguration
+        PRODUCT_NAME: RestroomShieldConfiguration
+        INFOPLIST_FILE: Extensions/ShieldConfiguration/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Extensions/ShieldConfiguration/RestroomShieldConfiguration.entitlements
+        SKIP_INSTALL: YES
+
+  RestroomShieldAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/ShieldAction
+      - path: Shared
+    info:
+      path: Extensions/ShieldAction/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettings.shield-action-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).RestroomShieldActionExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rubykaleli.RestroomRestriction.ShieldAction
+        PRODUCT_NAME: RestroomShieldAction
+        INFOPLIST_FILE: Extensions/ShieldAction/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Extensions/ShieldAction/RestroomShieldAction.entitlements
+        SKIP_INSTALL: YES
+
+  RestroomDeviceActivityMonitor:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/DeviceActivityMonitor
+      - path: Shared
+    info:
+      path: Extensions/DeviceActivityMonitor/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.deviceactivity.monitor
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).RestroomDeviceActivityMonitorExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rubykaleli.RestroomRestriction.DeviceActivityMonitor
+        PRODUCT_NAME: RestroomDeviceActivityMonitor
+        INFOPLIST_FILE: Extensions/DeviceActivityMonitor/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Extensions/DeviceActivityMonitor/RestroomDeviceActivityMonitor.entitlements
+        SKIP_INSTALL: YES

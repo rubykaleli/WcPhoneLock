@@ -1,0 +1,10 @@
+.DS_Store
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.ipa
+*.dSYM.zip
+*.dSYM
+WiFiman.shortcut
+PoopLockWIFI.shortcut
+

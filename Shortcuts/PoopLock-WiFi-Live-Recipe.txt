@@ -1,0 +1,167 @@
+================================================================================
+NOTE: The canonical shortcut instructions are in the app and in source code:
+  - In PoopLock: Settings → "View full shortcut recipe (steps + URL)"
+  - In this repo: Shared/ShortcutRecipeContent.swift (same text, easy to find in Xcode)
+================================================================================
+
+PoopLock — Build your own Wi-Fi details Shortcut (like WIFIman)
+
+WHAT YOU NEED
+- iPhone with iOS 17 or later (recommended)
+- Shortcuts app (built in)
+
+If you have NO PoopLock shortcut yet: that is expected — PoopLock cannot create one inside Shortcuts for you.
+This file is INSTRUCTIONS to build it yourself. There is no separate “download” until someone exports
+a .shortcut file (see EXPORT-INSTRUCTIONS.txt).
+
+FASTEST PATH (3 actions — dbm only)
+-----------------------------------
+1) Shortcuts → + → Get Network Details (Wi‑Fi).
+2) Text → type  pooplock://wifi?dbm=  then insert the RSSI variable from step 1.
+3) Open URLs → input = that Text.
+4) Rename to: PoopLockWIFI
+5) Run ▶︎ once. Then PoopLock → Test: run Wi‑Fi shortcut.
+
+SHORTCUT NAME (must match PoopLock Settings exactly)
+- Rename your shortcut to: PoopLockWIFI  (exact spelling, case-sensitive — default in the app)
+  (or change the name in PoopLock Settings to match your shortcut)
+
+WHAT APPLE ALLOWS HERE
+- The Shortcuts app can use "Get Network Details" and read Wi-Fi RSSI, SSID,
+  BSSID, RX/TX rates, noise, channel, and Wi-Fi standard (availability varies by iOS).
+- Normal App Store apps (including PoopLock) cannot read those values directly *unless* they use
+  approved APIs (e.g. NEHotspotNetwork with entitlements). The URL recipe is one path; WiFiman also
+  uses App Intents so Shortcuts runs *their app code* for dBm. PoopLock now includes an App Intent:
+  after install, search Shortcuts for “PoopLock” → “Get PoopLock Wi‑Fi snapshot” (native SSID/BSSID/signal).
+- You can still pass richer Shortcut-only fields into PoopLock with: pooplock://wifi?...query...
+
+WHY YOU CAN’T JUST USE WIFIMAN’S SHORTCUT (OR “CODE” YOURS FROM THE APP)
+- WiFiman’s shortcut is a binary package that talks to the WiFiman app (their URLs / actions).
+  PoopLock only understands links that start with pooplock://wifi? and use the query names in our
+  parser (see Shared/ShortcutWiFiReading.swift). Different app = different contract — we don’t see
+  how Ubiquiti formats their handoff unless we reverse‑engineer their shortcut.
+- Apple does not let a normal App Store app silently build or install Shortcuts in your library.
+  You add them with: build steps by hand, import an iCloud “Share link”, or open a .shortcut file
+  via Shortcuts. PoopLock’s “recipe” is the supported way to build the one shortcut that matches
+  our URL format.
+- What *is* already coded in PoopLock: parsing pooplock://wifi?…, storing readings, and (on device)
+  native Wi‑Fi via NEHotspotNetwork where entitlements allow. The only part Apple reserves for
+  Shortcuts is assembling “Get Network Details” → Text → Open URL — that’s the manual (or import)
+  step.
+- Names are case-sensitive: WiFiman, Wifiman, and WIFIman are all different. PoopLock Settings must
+  match the shortcut’s title under ••• → Name exactly.
+
+YOUR OWN ICLOUD LINK (NOT WIFIMAN’S)
+- Ubiquiti’s public shortcut URLs (e.g. icloud.com/shortcuts/…) only install *their* shortcut for
+  *their* app. You cannot repurpose that for PoopLock’s pooplock://wifi handoff. Links also return
+  “Not Found” if Apple removed them, the author unpublished them, or the link is wrong.
+- After you build the PoopLock Wi‑Fi shortcut with this recipe (name: PoopLockWIFI, last action
+  opens pooplock://wifi?…), you can publish *your* copy: Shortcuts → open the shortcut → ••• →
+  Share → Copy Link. Paste that HTTPS URL into PoopLock → Settings → “iCloud shortcut link”, then
+  “Add shortcut from link” so others get a WiFiman-style one-tap install — still *your* shortcut,
+  not WiFiman’s.
+- Developers can set a default import URL in code: Shared/PoopLockWifiShortcut.swift →
+  officialImportURL (optional).
+
+================================================================================
+PART A — Shortcut that shows live Wi-Fi details (on screen)
+================================================================================
+
+1. Open Shortcuts → tap + → New Shortcut.
+
+2. Tap “Add Action”.
+
+3. Search for:  Get Network Details
+   (If you do not see it, update iOS and search again. Name may be “Network Details”.)
+
+4. Tap the action and set:
+   - Network: Wi‑Fi  (if the action asks)
+
+5. Add Action → search:  Show Notification
+   - In the body, tap "Network Details" or insert variables from the previous step.
+   - Useful fields to test:
+     RSSI, Network Name, BSSID, RX Rate, TX Rate, Noise, Channel Number,
+     Wi-Fi Standard
+
+6. Run the shortcut with the Play button. You should see a notification with signal info.
+
+Tip: RSSI is usually a negative number (for example -58). That is the "dBm-style"
+reading people mean when they say "signal in dBm" on Wi-Fi.
+
+Tip: RX Rate / TX Rate are link speeds in Mbps, not internet speed test results.
+
+================================================================================
+PART B — Same shortcut, also send the details to PoopLock
+================================================================================
+
+1. After "Get Network Details", add:
+
+   Add Action → search:  Text
+
+2. Build this URL in the Text action using variables from Get Network Details:
+
+   pooplock://wifi?dbm=RSSI
+     &ssid=NETWORK_NAME
+     &bssid=BSSID
+     &rxMbps=RX_RATE
+     &txMbps=TX_RATE
+     &noise=NOISE
+     &channel=CHANNEL_NUMBER
+     &standard=WIFI_STANDARD
+
+   Replace each ALL_CAPS part by inserting the matching Shortcuts variable.
+   If your fields are on separate lines while editing, that is fine; just make sure
+   the final text passed to Open URLs is a single valid URL.
+
+3. Example when finished conceptually:
+
+   pooplock://wifi?dbm=-59&ssid=HomeWiFi&bssid=AA:BB:CC:DD:EE:FF&rxMbps=866
+   &txMbps=780&noise=-92&channel=44&standard=Wi-Fi%206
+
+   If your SSID or standard contains spaces, run "URL Encode" on those values first.
+
+4. Add Action → search:  Open URLs
+   - Turn "Open" on and feed it the text from step 2.
+
+5. Rename the shortcut to: PoopLockWIFI (must match PoopLock Settings exactly, including capitals).
+
+6. Run the shortcut. PoopLock should open briefly and store the last reading.
+   Check PoopLock → Settings → last Wi‑Fi payload.
+
+================================================================================
+PART C — “Live” without tapping Shortcuts every time
+================================================================================
+
+- Automation tab in Shortcuts → Create Personal Automation:
+  - Examples: Time (every 5 min), When I open PoopLock, When I connect to Wi-Fi.
+- Add your shortcut as the only action.
+- Turn off "Ask Before Running" if you want it silent (you will get a prompt the first time).
+
+Note: iOS may still throttle how often automations run to save battery.
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+- No "Get Network Details": update iOS; the action is not available on very old versions.
+- PoopLock does not open: confirm Info.plist includes the pooplock URL scheme (this
+  project already registers it) and rebuild/install the app.
+- “Could not find shortcut” / “does not exist”: the name in Shortcuts must match PoopLock Settings **exactly**, including capitals (e.g. PoopLockWIFI vs PoopLockWiFi are different). Use ••• → Name on the shortcut and copy the same string into Settings.
+- Scan Room still failing after that: enable **Settings → Use on‑device Wi‑Fi if Shortcuts didn’t return pooplock://wifi** so verification can fall back to `NEHotspotNetwork` when the shortcut never opens PoopLock.
+- Number is wrong format: PoopLock expects dbm or rssi as a normal number (e.g. -59).
+- Some fields missing: Shortcuts can only send what "Get Network Details" exposes on
+  that device / iOS version / current connection.
+
+APP INTENTS (“Get PoopLock Wi‑Fi snapshot”) — DEVELOPER / DEVICE TESTING
+- You do **not** need a paid Apple Developer account to test App Intents on your own iPhone; a free
+  Apple ID + local run from Xcode is enough for personal device testing.
+- After install, **open PoopLock at least once** so iOS registers `PoopLockAppShortcuts` with the system,
+  then search in Shortcuts → Add Action for “PoopLock”.
+- If actions don’t appear after code changes: delete the app, Xcode **Product → Clean Build Folder**,
+  reinstall, open the app once, check Shortcuts again (Shortcuts caches intents aggressively).
+- Confirm `App/PoopLockAppIntents.swift` has **Target Membership** checked for the main app target.
+- Use a **physical device**: Simulator often returns no Wi‑Fi / nil for NEHotspotNetwork.
+- **Location:** Wi‑Fi identifiers are treated like location-related data. Grant PoopLock **Location**
+  (Settings → Privacy → Location) — the App Intent returns a clear message if Location isn’t allowed yet.
+
+================================================================================

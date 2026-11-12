@@ -1,0 +1,34 @@
+================================================================================
+PoopLock — ship a WiFiman-style installable shortcut (.shortcut)
+================================================================================
+
+You cannot generate a valid .shortcut file from Xcode alone. Build it once in the
+Shortcuts app using the same steps as Shared/ShortcutRecipeContent.swift, then export.
+
+STEPS (MAINTAINER)
+----------------
+1. On iPhone: Shortcuts → build the PoopLock Wi‑Fi shortcut (recipe in app Settings).
+2. Rename to: PoopLockWIFI (must match PoopLockWifiShortcut.defaultName in code).
+3. ••• → Share → **Share File** (or export) and save `PoopLockWIFI.shortcut`.
+4. Drag that file into this Xcode project under Shortcuts/ and check **Copy items** + **Add to targets**
+   for RestroomRestriction (and RestroomRestrictionLocal if you use that scheme).
+5. Confirm **Build Phases → Copy Bundle Resources** lists PoopLockWIFI.shortcut.
+6. Rebuild. The Install sheet will offer **Install** (import) and **Share** for the bundled file.
+
+ONE-TAP INSTALL WITHOUT BUNDLING (HOSTED URL — LIKE WIFIMAN)
+-------------------------------------------------------------
+• Upload `PoopLockWIFI.shortcut` to a public **https://** URL. Common options:
+  - **GitHub:** commit the file, open it on GitHub → **Raw** → copy that URL
+    (ends with .shortcut).
+  - **iCloud Shortcuts:** ••• → Share → Copy Link (icloud.com/shortcuts/...).
+
+• Set `PoopLockWifiShortcut.officialImportURL` in Shared/PoopLockWifiShortcut.swift to that URL,
+  or paste the link in PoopLock Settings → “iCloud shortcut link”.
+
+• PoopLock opens `shortcuts://import-shortcut?url=…` — user taps Add Shortcut once.
+
+AFTER INSTALL
+-------------
+Settings → “Exact name in Shortcuts app” must still match the shortcut title (default PoopLockWIFI).
+
+================================================================================
