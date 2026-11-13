@@ -1,30 +1,48 @@
-# WcPhoneLock (`RestroomRestriction`)
+# WcPhoneLock
 
-iOS focus app that blocks distracting apps when you are inside your home geofence and only grants temporary unlock windows after verifying that your phone is not in the bathroom.
+A personal iOS focus prototype that locks distracting apps when you're in the bathroom so you don't get stuck scrolling and can leave earlier.
 
-Room checks combine **CoreMotion** magnetometer signatures, barometric pressure deltas, and optional Wi-Fi telemetry (on-device `NEHotspotNetwork` or Apple Shortcuts via `pooplock://wifi`).
+---
 
-## Layout
+## How It Works
 
-- `App/Features/` — SwiftUI views split by screen (`Home/`, `Calibration/`, `Verification/`, `Settings/`, `History/`, `Components/`).
-- `App/Services/` — Protocol-backed controllers (`ProtectionController`, `ProtectionContracts`, `RoomVerificationManager`, `HomeLocationManager`, `ScreenTimeManager`, `SensorScanner`).
-- `Extensions/` — `ShieldConfiguration`, `ShieldAction`, and `DeviceActivityMonitor` targets.
-- `Shared/` — App Group persistence (`AppGroupStore`), settings, identifiers, and Shortcut payload parsing.
-- `Shortcuts/` — Recipe and export notes for the optional `PoopLockWIFI` Apple Shortcut.
+1. **Teach it your rooms:** You take a quick sensor snapshot in your living room/bedroom and another in your bathroom.
+2. **Sensor signatures:** It samples the barometer (air pressure changes), magnetometer (magnetic flux), geofence location, and optional Wi-Fi signal/RSSI, then saves the calibrated room profiles locally into the App Group (`AppGroupStore`).
+3. **Smart app lock:** When the sensors detect you're in the washroom, it arms iOS Screen Time shields to lock selected apps.
+4. **Unlock windows:** Once you walk out into another room, run a quick check to unlock your apps.
 
-## Build Targets
+> **Note:** This is a personal prototype and focus experiment exploring multi-sensor room classification with SwiftUI and Apple Screen Time APIs.
 
-- **`RestroomRestrictionLocal`** (`LOCAL_TESTING`): Builds on iOS Simulator or a free Personal Team. Runs geofencing, CoreMotion scans, notifications, and unlock timers with simulated shielding.
-- **`RestroomRestriction`**: Full Screen Time build (`FamilyControls`, `ManagedSettings`, `DeviceActivity`) requiring a paid Apple Developer Program account with the Family Controls entitlement.
+---
+
+## Build Schemes
+
+- **`RestroomRestrictionLocal`** *(Recommended for testing)*: Builds on the iOS Simulator or a free Apple ID without special developer entitlements. Uses simulated shields and full sensor/timer logic.
+- **`RestroomRestriction`**: Uses official Apple Screen Time frameworks (`FamilyControls`, `ManagedSettings`, `DeviceActivity`). Requires an Apple Developer account with Family Controls entitlement approval.
+
+---
 
 ## Running Locally
 
+Generate the Xcode project using [XcodeGen](https://github.com/yonaskolb/XcodeGen):
+
 ```bash
-xcodegen generate   # regenerate .xcodeproj from project.yml
+xcodegen generate
 open RestroomRestriction.xcodeproj
 ```
 
-Choose the `RestroomRestrictionLocal` scheme for simulator or personal device testing.
+Select the **`RestroomRestrictionLocal`** scheme and run on any iOS Simulator or connected iPhone.
+
+---
+
+## Project Layout
+
+- `App/Features/` — SwiftUI screens: Home dashboard, calibration sheet, room verification, and settings.
+- `App/Services/` — Sensor scanner (`CoreMotion`), location manager (`CoreLocation`), and shield controller protocols.
+- `Extensions/` — Screen Time extensions (`ShieldConfiguration`, `ShieldAction`, `DeviceActivityMonitor`).
+- `Shared/` — Local App Group storage (`AppGroupStore`) and sensor payload models.
+
+---
 
 ## License
 
